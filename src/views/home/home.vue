@@ -7,18 +7,20 @@
       </template>
     </nav-bar>
     <!-- :banners 公共化banners数组 -->
-    <scroll class="content">
+    <scroll class="content" ref="scroll" 
+    :porbe-type="3" 
+    @scroll="contentScroll" :pull-up-load="true" @pullingUp="loadMore" :is-click="true">
       <home-swiper :banners="banners" />
       <recommend-view :recommends="recommends" />
       <feature-view />
       <tab-control
         class="tab-control"
         :titles="['流行', '新款', '精选']"
-        v-on:tabClick="tabClick"
-      />
+        v-on:tabClick="tabClick"/>
       <goods-list v-bind:goods="showGoods" />
-      <back-top />
+      
     </scroll>
+    <back-top @click.native="btnClick" v-show="isShowBackTop"/>
   </div>
 </template>
 
@@ -48,6 +50,7 @@ export default {
         sell: { page: 0, list: [] },
       },
       currentType: "pop", //默认值为pop流行
+      isShowBackTop: false,
     };
   },
   components: {
@@ -88,6 +91,26 @@ export default {
     },
 
     /**
+     * 事件监听相关的方法
+     * */ 
+    btnClick() {
+      // 使用this.$refs获取scroll滚动条坐标
+      this.$refs.scroll.scrollTo(0, 0)
+    },
+    contentScroll(position) {
+      // 上拉加载监听事件
+      this.isShowBackTop = (-position.y) > 1000
+    },
+    // 上拉加载事件触发商品列表翻页请求
+    loadMore() {
+      // console.log('上拉加载更多')
+      this.getHomeGoods(this.currentType)
+
+      // 刷新异步请求的商品列表，刷新BaseScroll滚动条内的展示窗口高度（item+图片高度）
+      this.$refs.scroll.scroll.refresh()
+    },
+
+    /**
      * 网络请求数据
      * */
     getHomeMultidata() {
@@ -103,6 +126,8 @@ export default {
         // 数组追加进另一个数组简写 array.push(...)
         this.goods[type].list.push(...res.data.list);
         this.goods[type].page += 1;
+
+        this.$refs.scroll.finishPullUp()
       });
     },
   },

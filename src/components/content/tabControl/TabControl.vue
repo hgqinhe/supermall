@@ -29,6 +29,7 @@
    methods: {
      itemClick(index) {
        this.currentIndex = index
+       console.log(index)
       //  组件点击事件，子组件向父组件传递数据
       this.$emit('tabClick',index)
      }
