@@ -151,9 +151,7 @@ export default {
       return this.goods[this.currentType].list;
     },
   },
-  // destroyed(){
-  //   console.log('1111111')
-  // },
+
   // 进入当前页面时跳转记录滚动条位置
   activated() {
     this.$refs.scroll.scrollTo(0, this.saveY, 0)
